@@ -1,0 +1,35 @@
+package main
+import	"fmt"
+import	"strconv"
+import	"time"
+
+type Token struct {
+	data string
+	recipient int
+}
+var N=5 //кол потоков
+var i int
+
+func main() {
+	channel := make(chan string)
+	t := Token{data: "sms",recipient: 1}   
+	for i:=1; i<=N; i++{  		
+		go send(channel, i) 	
+		go get(channel, t, i)
+		time.Sleep(100 * time.Millisecond)		
+	}
+}
+
+func send (channel <- chan string, i int) {
+        s := <-channel 
+	if i == N{	
+        	fmt.Println(" and send " + s + " to acceptor")  
+	}else{
+		fmt.Println(" and send " + s + " to flow " + strconv.Itoa(i+1))
+	}
+}
+
+func get(channel chan <- string, tok Token, i int) {  
+        fmt.Print("flow  " + strconv.Itoa(i) + "  get " + tok.data)
+       channel <- tok.data  
+}
